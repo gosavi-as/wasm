@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package graph;
+import "google/protobuf/struct.proto";
+
+message KnowledgeGraph {
+  map<string, google.protobuf.Struct> nodes = 1;
+  map<string, google.protobuf.Struct> edges = 2;
+}
