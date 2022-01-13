@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"syscall/js"
 	"time"
 )
@@ -15,7 +16,9 @@ var (
 	domManipulationCnt    = float32(0)
 	domManipulationTimeMS = float32(0)
 )
-
+const (
+	AddSrvK             = "localhost:8080"
+)
 /***
 This is client side code.
 This will go to client browser and execute over there.
@@ -29,7 +32,7 @@ func registerCallbacks() {
 Used to establish websocket connection
 */
 func webSocketConnection() {
-	ws = js.Global().Get("WebSocket").New("ws://" + AddSrv + "/ws")
+	ws = js.Global().Get("WebSocket").New("ws://" + AddSrvK + "/ws")
 
 	// Call back for webSocket open
 	ws.Call("addEventListener", "open", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -73,10 +76,15 @@ func webSocketEventListener() {
 
 		// Manipulate table
 		tableDom := "<tbody>"
-		tableDom = "<tr><th scope=\"col\">Relation-1</th><th scope=\"col\">Relation-2</th><th scope=\"col\">Relation-3</th><th scope=\"col\">Relation-4</th><th scope=\"col\">Relation-5</th></tr>"
+		tableDom = "<tr><th scope=\"col\">#</th><th scope=\"col\">Relation-1</th><th scope=\"col\">Relation-2</th><th scope=\"col\">Relation-3</th><th scope=\"col\">Relation-4</th><th scope=\"col\">Relation-5</th></tr>"
+		cnt := 0
 		for k, v := range fromContent {
+			cnt++
+			if cnt>100 {
+				break
+			}
 			toContent := v.(map[string]interface{})
-			tableDom += "<tr>"
+			tableDom += "<tr><td>" + strconv.Itoa(cnt) +"</td>"
 			for k1, v1 := range toContent {
 				relContent := v1.(map[string]interface{})
 				for _, v2 := range relContent {
